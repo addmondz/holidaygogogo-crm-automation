@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\Admin\AgentController;
+use App\Http\Controllers\Admin\BroadcastController;
 use App\Http\Controllers\Admin\ChannelController;
+use App\Http\Controllers\Admin\ContactImportController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\SimulatorController;
 use App\Http\Controllers\Admin\TagController;
@@ -68,6 +70,19 @@ Route::middleware('auth')->group(function () {
         Route::delete('channels/{channel}', [ChannelController::class, 'destroy'])->name('channels.destroy');
         Route::post('channels/{channel}/test', [ChannelController::class, 'test'])->name('channels.test');
         Route::post('channels/{channel}/sync-templates', [ChannelController::class, 'syncTemplates'])->name('channels.sync-templates');
+
+        Route::get('broadcasts', [BroadcastController::class, 'index'])->name('broadcasts.index');
+        Route::get('broadcasts/create', [BroadcastController::class, 'create'])->name('broadcasts.create');
+        Route::post('broadcasts', [BroadcastController::class, 'store'])->name('broadcasts.store');
+        Route::get('broadcasts/audience', [BroadcastController::class, 'audience'])->name('broadcasts.audience');
+        Route::post('broadcasts/test', [BroadcastController::class, 'test'])->name('broadcasts.test');
+        Route::get('broadcasts/{broadcast}', [BroadcastController::class, 'show'])->name('broadcasts.show');
+        Route::get('broadcasts/{broadcast}/edit', [BroadcastController::class, 'edit'])->name('broadcasts.edit');
+        Route::patch('broadcasts/{broadcast}', [BroadcastController::class, 'update'])->name('broadcasts.update');
+        Route::delete('broadcasts/{broadcast}', [BroadcastController::class, 'destroy'])->name('broadcasts.destroy');
+        Route::post('broadcasts/{broadcast}/cancel', [BroadcastController::class, 'cancel'])->name('broadcasts.cancel');
+
+        Route::post('contacts/import', [ContactImportController::class, 'store'])->name('contacts.import');
 
         Route::post('simulate', [SimulatorController::class, 'store'])->name('simulate');
 

@@ -8,8 +8,10 @@ import {
     Plus,
     Search,
     Trash2,
+    Upload,
 } from '@lucide/vue';
 import { computed, ref } from 'vue';
+import ContactImportController from '@/actions/App/Http/Controllers/Admin/ContactImportController';
 import ContactController from '@/actions/App/Http/Controllers/Contacts/ContactController';
 import InboxController from '@/actions/App/Http/Controllers/Inbox/InboxController';
 import Heading from '@/components/Heading.vue';
@@ -152,6 +154,34 @@ function confirmDelete(): void {
     }
 }
 
+// --- Import ---------------------------------------------------------------------------
+const importOpen = ref(false);
+const importForm = useForm({
+    file: null as File | null,
+    tag_ids: [] as number[],
+});
+
+const sampleCsv = `data:text/csv;charset=utf-8,${encodeURIComponent(
+    'name,phone,email,tags,status\nKerry Tan,012-345 6789,kerry@example.com,Japan;Hot lead,interested\nSiti Aminah,+60 19-876 5432,,Bali,new\n',
+)}`;
+
+function toggleImportTag(id: number): void {
+    importForm.tag_ids = importForm.tag_ids.includes(id)
+        ? importForm.tag_ids.filter((t) => t !== id)
+        : [...importForm.tag_ids, id];
+}
+
+function submitImport(): void {
+    importForm.submit(ContactImportController.store(), {
+        forceFormData: true,
+        preserveScroll: true,
+        onSuccess: () => {
+            importOpen.value = false;
+            importForm.reset();
+        },
+    });
+}
+
 // --- Start a WhatsApp chat --------------------------------------------------------
 function startWhatsApp(contact: ContactRow): void {
     const existing = contact.conversations.find(
@@ -180,6 +210,9 @@ function startWhatsApp(contact: ContactRow): void {
                 description="Every lead who has messaged you, plus contacts you imported for blasts."
             />
             <div v-if="isAdmin" class="flex gap-2">
+                <Button variant="outline" @click="importOpen = true"
+                    ><Upload /> Import CSV</Button
+                >
                 <Button @click="openCreate"><Plus /> Add contact</Button>
             </div>
         </div>
@@ -468,6 +501,86 @@ function startWhatsApp(contact: ContactRow): void {
                     >
                     <Button type="submit" :disabled="form.processing"
                         >Save</Button
+                    >
+                </DialogFooter>
+            </form>
+        </DialogContent>
+    </Dialog>
+
+    <Dialog v-model:open="importOpen">
+        <DialogContent class="sm:max-w-lg">
+            <DialogHeader>
+                <DialogTitle>Import contacts from a spreadsheet</DialogTitle>
+                <DialogDescription>
+                    Save your Excel/Google Sheet as <strong>CSV</strong>. The
+                    first row must have column names: <code>name</code>,
+                    <code>phone</code> (required), <code>email</code>,
+                    <code>tags</code> (separate with <code>;</code>) and
+                    <code>status</code>. Existing contacts (same phone) are
+                    updated, not duplicated.
+                </DialogDescription>
+            </DialogHeader>
+            <form class="grid gap-4" @submit.prevent="submitImport">
+                <div class="grid gap-2">
+                    <Label for="import-file">CSV file</Label>
+                    <input
+                        id="import-file"
+                        type="file"
+                        accept=".csv,text/csv"
+                        class="block w-full rounded-md border px-3 py-1.5 text-sm file:mr-3 file:rounded file:border-0 file:bg-muted file:px-2 file:py-1 file:text-sm"
+                        @change="
+                            importForm.file =
+                                ($event.target as HTMLInputElement)
+                                    .files?.[0] ?? null
+                        "
+                    />
+                    <a
+                        :href="sampleCsv"
+                        download="contacts-sample.csv"
+                        class="text-xs underline"
+                        >Download a sample file</a
+                    >
+                    <InputError :message="importForm.errors.file" />
+                </div>
+                <div v-if="tags.length" class="grid gap-2">
+                    <Label>Also tag everyone in this file with</Label>
+                    <div class="flex flex-wrap gap-1.5">
+                        <button
+                            v-for="tag in tags"
+                            :key="tag.id"
+                            type="button"
+                            class="inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs"
+                            :class="
+                                importForm.tag_ids.includes(tag.id)
+                                    ? 'border-primary bg-muted'
+                                    : 'opacity-70'
+                            "
+                            @click="toggleImportTag(tag.id)"
+                        >
+                            <span
+                                class="size-2 rounded-full"
+                                :class="tagDotClasses[tag.color]"
+                            />
+                            {{ tag.name }}
+                        </button>
+                    </div>
+                </div>
+                <p class="text-xs text-muted-foreground">
+                    Only import people who agreed to receive messages from
+                    HolidayGoGoGo. Local numbers get the default country code
+                    (+60).
+                </p>
+                <DialogFooter>
+                    <Button
+                        type="button"
+                        variant="secondary"
+                        @click="importOpen = false"
+                        >Cancel</Button
+                    >
+                    <Button
+                        type="submit"
+                        :disabled="!importForm.file || importForm.processing"
+                        >Import</Button
                     >
                 </DialogFooter>
             </form>

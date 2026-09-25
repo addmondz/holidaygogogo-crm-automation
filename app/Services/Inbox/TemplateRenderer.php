@@ -55,7 +55,7 @@ class TemplateRenderer
                         ?? collect($component['example']['body_text_named_params'] ?? [])->firstWhere('param_name', $name)['example']
                         ?? null;
 
-                    $variables[] = ['key' => "body.{$name}", 'label' => "{{{$name}}}", 'kind' => 'text', 'example' => $example];
+                    $variables[] = ['key' => "body.{$name}", 'label' => "Message {{{$name}}}", 'kind' => 'text', 'example' => $example];
                 }
             }
 

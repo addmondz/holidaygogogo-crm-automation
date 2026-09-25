@@ -60,8 +60,9 @@ class Outbox
      * chat after the 24-hour window has closed, or in a blast.
      *
      * @param  array<string, string|null>  $values
+     * @param  array<string, mixed>  $meta  Extra message metadata (e.g. the blast it belongs to).
      */
-    public function sendTemplate(Conversation $conversation, ?User $agent, WhatsappTemplate $template, array $values): Message
+    public function sendTemplate(Conversation $conversation, ?User $agent, WhatsappTemplate $template, array $values, array $meta = [], bool $queued = true): Message
     {
         if (! $conversation->channel->isWhatsApp()) {
             throw ValidationException::withMessages(['template' => __('Templates can only be sent on WhatsApp.')]);
@@ -73,6 +74,7 @@ class Outbox
             'type' => MessageType::Template,
             'body' => $this->templates->render($template, $values, $contact, $agent),
             'meta' => [
+                ...$meta,
                 'template' => [
                     'id' => $template->id,
                     'name' => $template->name,
@@ -80,7 +82,23 @@ class Outbox
                     'components' => $this->templates->components($template, $values, $contact, $agent),
                 ],
             ],
-        ]);
+        ], $queued);
+    }
+
+    /**
+     * A Messenger blast message (only to chats inside the 24-hour window).
+     *
+     * @param  array<string, mixed>  $meta
+     */
+    public function sendBroadcastText(Conversation $conversation, string $body, array $meta = []): Message
+    {
+        $this->ensureCanReplyFreely($conversation);
+
+        return $this->queue($conversation, null, [
+            'type' => MessageType::Text,
+            'body' => $body,
+            'meta' => $meta,
+        ], queued: false);
     }
 
     /**
@@ -113,8 +131,10 @@ class Outbox
 
     /**
      * @param  array<string, mixed>  $attributes
+     * @param  bool  $queued  False for blasts: the caller sends right away and
+     *                        live updates are skipped to avoid flooding agents' screens.
      */
-    private function queue(Conversation $conversation, ?User $agent, array $attributes): Message
+    private function queue(Conversation $conversation, ?User $agent, array $attributes, bool $queued = true): Message
     {
         // Replying to an unassigned chat claims it, so two agents don't answer the same lead.
         if ($agent && ! $conversation->assigned_user_id) {
@@ -133,13 +153,18 @@ class Outbox
         $conversation->update([
             'last_message_at' => $message->created_at,
             'last_message_preview' => $message->preview(),
-            'unread_count' => 0,
+            // An agent replying has read the chat; a blast has not.
+            ...($agent ? ['unread_count' => 0] : []),
         ]);
 
         $contact = $conversation->contact;
 
         if ($agent && $contact->status === ContactStatus::New) {
             $contact->update(['status' => ContactStatus::Contacted]);
+        }
+
+        if (! $queued) {
+            return $message;
         }
 
         Realtime::send(new MessageSaved($message));

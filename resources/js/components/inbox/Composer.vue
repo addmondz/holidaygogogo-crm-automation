@@ -214,9 +214,9 @@ const windowLabel = computed(() =>
         >
             <p class="flex-1 text-amber-900 dark:text-amber-200">
                 <template v-if="conversation.channel.type === 'whatsapp'">
-                    It's been more than 24 hours since this customer's last
-                    message, so WhatsApp only allows an
-                    <strong>approved template</strong>. When they reply, you can
+                    WhatsApp only allows free-form replies within 24 hours of
+                    the customer's last message. Start with an
+                    <strong>approved template</strong>; once they reply, you can
                     chat freely again.
                 </template>
                 <template v-else>

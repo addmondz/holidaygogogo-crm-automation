@@ -5,6 +5,7 @@ import {
     Contact,
     Inbox,
     LayoutGrid,
+    Megaphone,
     PlugZap,
     SlidersHorizontal,
     Tags,
@@ -13,6 +14,7 @@ import {
 } from '@lucide/vue';
 import { computed } from 'vue';
 import AgentController from '@/actions/App/Http/Controllers/Admin/AgentController';
+import BroadcastController from '@/actions/App/Http/Controllers/Admin/BroadcastController';
 import ChannelController from '@/actions/App/Http/Controllers/Admin/ChannelController';
 import SettingsController from '@/actions/App/Http/Controllers/Admin/SettingsController';
 import TagController from '@/actions/App/Http/Controllers/Admin/TagController';
@@ -43,6 +45,15 @@ const mainNavItems = computed<NavItem[]>(() => [
     { title: 'Inbox', href: InboxController.index(), icon: Inbox },
     { title: 'Contacts', href: ContactController.index(), icon: Contact },
     { title: 'Quick replies', href: QuickReplyController.index(), icon: Zap },
+    ...(isAdmin.value
+        ? [
+              {
+                  title: 'Blasts',
+                  href: BroadcastController.index(),
+                  icon: Megaphone,
+              },
+          ]
+        : []),
     { title: 'Dashboard', href: dashboard(), icon: LayoutGrid },
 ]);
 

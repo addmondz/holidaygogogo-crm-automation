@@ -262,7 +262,12 @@ function confirmDelete(): void {
                             Remove
                         </button>
                     </p>
-                    <Input id="qr-file" type="file" @change="onFile" />
+                    <input
+                        id="qr-file"
+                        type="file"
+                        class="block w-full rounded-md border px-3 py-1.5 text-sm file:mr-3 file:rounded file:border-0 file:bg-muted file:px-2 file:py-1 file:text-sm"
+                        @change="onFile"
+                    />
                     <p class="text-xs text-muted-foreground">
                         E.g. a brochure PDF or itinerary image.
                     </p>

@@ -83,6 +83,11 @@ class Message extends Model
 
         $text = trim((string) $this->body);
 
+        // Templates start with a *bold* header; the chat list shows plain text.
+        if ($this->type === MessageType::Template) {
+            $text = trim(str_replace('*', '', $text));
+        }
+
         if ($label && $text !== '' && $this->type !== MessageType::Reaction) {
             $label .= ': '.$text;
         }
