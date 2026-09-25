@@ -21,11 +21,6 @@ class MediaController extends Controller
 
         abort_unless($path && MediaStore::disk()->exists($path), 404);
 
-        $filename = $message->media['filename'] ?? basename($path);
-        $headers = ['Content-Type' => $message->media['mime'] ?? 'application/octet-stream', 'Cache-Control' => 'private, max-age=86400'];
-
-        return $request->boolean('download')
-            ? MediaStore::disk()->download($path, $filename, $headers)
-            : MediaStore::disk()->response($path, $filename, $headers);
+        return MediaStore::respond($path, $message->media['filename'] ?? null, $message->media['mime'] ?? null, $request->boolean('download'));
     }
 }

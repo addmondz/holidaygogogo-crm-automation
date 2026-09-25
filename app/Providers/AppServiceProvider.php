@@ -19,7 +19,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Without Reverb keys, fall back to "refresh every few seconds" rather
+        // than failing every request.
+        if (config('broadcasting.default') === 'reverb' && blank(config('broadcasting.connections.reverb.key'))) {
+            config(['broadcasting.default' => 'log']);
+        }
     }
 
     /**

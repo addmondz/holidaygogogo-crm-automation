@@ -80,11 +80,7 @@ class QuickReplyController extends Controller
         abort_unless($quickReply->is_shared || $quickReply->user_id === $request->user()->id, 403);
         abort_unless($quickReply->attachment_path && MediaStore::disk()->exists($quickReply->attachment_path), 404);
 
-        return MediaStore::disk()->response(
-            $quickReply->attachment_path,
-            $quickReply->attachment_name,
-            ['Content-Type' => $quickReply->attachment_mime ?? 'application/octet-stream'],
-        );
+        return MediaStore::respond($quickReply->attachment_path, $quickReply->attachment_name, $quickReply->attachment_mime);
     }
 
     /**

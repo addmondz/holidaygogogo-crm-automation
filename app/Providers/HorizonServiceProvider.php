@@ -21,6 +21,16 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
     }
 
     /**
+     * Admins only, in every environment (Horizon allows everyone locally by default).
+     */
+    protected function authorization(): void
+    {
+        $this->gate();
+
+        Horizon::auth(fn ($request) => Gate::check('viewHorizon', [$request->user()]));
+    }
+
+    /**
      * Register the Horizon gate.
      *
      * Only admins can open the queue dashboard at /horizon.

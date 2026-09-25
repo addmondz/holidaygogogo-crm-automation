@@ -101,6 +101,30 @@ class AccessTest extends TestCase
         $this->actingAs(User::factory()->admin()->create())->get(route('media.show', $message))->assertOk();
     }
 
+    public function test_risky_files_are_always_downloaded_never_shown_inline()
+    {
+        Storage::fake('local');
+        $admin = User::factory()->admin()->create();
+        $conversation = Conversation::factory()->create();
+
+        $html = Message::factory()->for($conversation)->create([
+            'type' => 'document',
+            'media' => MediaStore::put('<script>alert(1)</script>', 'text/html', 'evil.html'),
+        ]);
+        $photo = Message::factory()->for($conversation)->create([
+            'type' => 'image',
+            'media' => MediaStore::put('IMG', 'image/jpeg', 'photo.jpg'),
+        ]);
+
+        $response = $this->actingAs($admin)->get(route('media.show', $html));
+        $response->assertOk()->assertHeader('Content-Type', 'application/octet-stream')->assertDownload('evil.html');
+
+        $this->actingAs($admin)->get(route('media.show', $photo))
+            ->assertOk()
+            ->assertHeader('Content-Type', 'image/jpeg')
+            ->assertHeader('X-Content-Type-Options', 'nosniff');
+    }
+
     public function test_agents_can_assign_and_close_chats()
     {
         $agent = User::factory()->create();
