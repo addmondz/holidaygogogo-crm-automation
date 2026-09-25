@@ -4,6 +4,9 @@ export type User = {
     email: string;
     avatar?: string;
     email_verified_at: string | null;
+    role: 'admin' | 'agent';
+    is_active: boolean;
+    is_available: boolean;
     two_factor_enabled?: boolean;
     created_at: string;
     updated_at: string;
@@ -12,6 +15,7 @@ export type User = {
 
 export type Auth = {
     user: User;
+    isAdmin: boolean;
 };
 
 export type Passkey = {

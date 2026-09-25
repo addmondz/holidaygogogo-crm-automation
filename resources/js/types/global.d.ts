@@ -19,6 +19,10 @@ declare module '@inertiajs/core' {
         sharedPageProps: {
             name: string;
             auth: Auth;
+            crm: {
+                demoMode: boolean;
+                realtime: boolean;
+            };
             sidebarOpen: boolean;
             [key: string]: unknown;
         };

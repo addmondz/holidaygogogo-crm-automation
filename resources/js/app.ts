@@ -3,9 +3,18 @@ import { initializeTheme } from '@/composables/useAppearance';
 import AppLayout from '@/layouts/AppLayout.vue';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
+import { configureEcho } from '@laravel/echo-vue';
 import { initializeFlashToast } from '@/lib/flashToast';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+// Real-time updates through Laravel Reverb. Without Reverb configured the
+// inbox falls back to refreshing every few seconds.
+if (import.meta.env.VITE_REVERB_APP_KEY) {
+    configureEcho({
+        broadcaster: 'reverb',
+    });
+}
+
+const appName = import.meta.env.VITE_APP_NAME || 'HolidayGoGoGo CRM';
 
 void createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
