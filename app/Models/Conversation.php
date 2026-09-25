@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\ConversationStatus;
 use App\Enums\InboxVisibility;
 use App\Support\CrmSettings;
+use Carbon\CarbonInterface;
 use Database\Factories\ConversationFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
@@ -12,7 +13,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Carbon;
 
 #[Fillable([
     'channel_id', 'contact_id', 'external_id', 'assigned_user_id', 'status',
@@ -70,7 +70,7 @@ class Conversation extends Model
         return $this->hasMany(Message::class);
     }
 
-    public function windowExpiresAt(): ?Carbon
+    public function windowExpiresAt(): ?CarbonInterface
     {
         return $this->last_inbound_at?->copy()->addHours(self::SERVICE_WINDOW_HOURS);
     }
