@@ -7,6 +7,7 @@ import {
     LayoutGrid,
     Megaphone,
     PlugZap,
+    Rocket,
     SlidersHorizontal,
     Tags,
     Users,
@@ -17,6 +18,7 @@ import AgentController from '@/actions/App/Http/Controllers/Admin/AgentControlle
 import BroadcastController from '@/actions/App/Http/Controllers/Admin/BroadcastController';
 import ChannelController from '@/actions/App/Http/Controllers/Admin/ChannelController';
 import SettingsController from '@/actions/App/Http/Controllers/Admin/SettingsController';
+import SetupController from '@/actions/App/Http/Controllers/Admin/SetupController';
 import TagController from '@/actions/App/Http/Controllers/Admin/TagController';
 import ContactController from '@/actions/App/Http/Controllers/Contacts/ContactController';
 import InboxController from '@/actions/App/Http/Controllers/Inbox/InboxController';
@@ -58,6 +60,7 @@ const mainNavItems = computed<NavItem[]>(() => [
 ]);
 
 const adminNavItems = computed<NavItem[]>(() => [
+    { title: 'Meta setup', href: SetupController.show(), icon: Rocket },
     { title: 'Agents', href: AgentController.index(), icon: Users },
     { title: 'Tags', href: TagController.index(), icon: Tags },
     { title: 'Channels', href: ChannelController.index(), icon: PlugZap },

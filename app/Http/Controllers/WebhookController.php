@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Jobs\ProcessMessengerWebhook;
 use App\Jobs\ProcessWhatsAppWebhook;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
@@ -24,6 +25,9 @@ class WebhookController extends Controller
         $given = (string) $request->query('hub_verify_token', $request->query('hub.verify_token'));
 
         abort_unless($token !== '' && $mode === 'subscribe' && hash_equals($token, $given), 403, 'Invalid verify token.');
+
+        // Lets the setup wizard show a green tick once Meta has verified the URL.
+        Setting::set('meta.webhook_verified.'.($request->is('webhooks/messenger') ? 'messenger' : 'whatsapp'), now()->toIso8601String());
 
         return response((string) $request->query('hub_challenge', $request->query('hub.challenge')), 200, [
             'Content-Type' => 'text/plain',

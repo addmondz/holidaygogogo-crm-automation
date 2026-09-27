@@ -74,7 +74,7 @@ To see real-time updates, log in as the admin and the agent in two browser windo
 ## Going live
 
 1. **Server:** follow [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). Laravel Forge + a small VPS is the easiest route.
-2. **Meta:** follow [docs/META_SETUP.md](docs/META_SETUP.md) to connect your WhatsApp number and Facebook Page.
+2. **Meta:** log in as admin and open **Admin → Meta setup**. The step-by-step wizard walks you from creating your Facebook Page to going live, with links to each Meta page and automatic checks. (The same steps are in [docs/META_SETUP.md](docs/META_SETUP.md).)
 3. **First admin:** `php artisan crm:create-admin`
 4. In the CRM, go to **Admin → Channels** and add your WhatsApp number and Facebook Page. Click **Test connection**, then **Sync templates**.
 5. Add your agents (**Admin → Agents**), tags (**Admin → Tags**) and quick replies.

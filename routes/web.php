@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\BroadcastController;
 use App\Http\Controllers\Admin\ChannelController;
 use App\Http\Controllers\Admin\ContactImportController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\SetupController;
 use App\Http\Controllers\Admin\SimulatorController;
 use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\AvailabilityController;
@@ -20,6 +21,9 @@ use App\Http\Controllers\QuickReplyController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn () => redirect()->route(auth()->check() ? 'inbox.index' : 'login'))->name('home');
+
+// Public: Meta requires a privacy policy link before the app can go Live.
+Route::view('privacy', 'privacy')->name('privacy');
 
 Route::middleware('auth')->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
@@ -85,6 +89,10 @@ Route::middleware('auth')->group(function () {
         Route::post('contacts/import', [ContactImportController::class, 'store'])->name('contacts.import');
 
         Route::post('simulate', [SimulatorController::class, 'store'])->name('simulate');
+
+        Route::get('setup', [SetupController::class, 'show'])->name('setup.show');
+        Route::post('setup/{step}', [SetupController::class, 'complete'])->name('setup.complete');
+        Route::delete('setup/{step}', [SetupController::class, 'undo'])->name('setup.undo');
 
         Route::get('settings', [SettingsController::class, 'edit'])->name('settings.edit');
         Route::patch('settings', [SettingsController::class, 'update'])->name('settings.update');

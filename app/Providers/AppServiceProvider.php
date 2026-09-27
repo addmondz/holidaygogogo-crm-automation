@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Support\MetaSettings;
 use Carbon\CarbonImmutable;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\DevCommands;
@@ -32,6 +33,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        MetaSettings::applyToConfig();
         $this->configureRateLimiting();
         $this->configureDevCommands();
     }
