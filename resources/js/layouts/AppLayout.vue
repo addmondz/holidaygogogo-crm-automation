@@ -2,13 +2,14 @@
 import AppLayout from '@/layouts/app/AppSidebarLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 
-const { breadcrumbs = [] } = defineProps<{
+const { breadcrumbs = [], fullHeight = false } = defineProps<{
     breadcrumbs?: BreadcrumbItem[];
+    fullHeight?: boolean;
 }>();
 </script>
 
 <template>
-    <AppLayout :breadcrumbs="breadcrumbs">
+    <AppLayout :breadcrumbs="breadcrumbs" :full-height="fullHeight">
         <slot />
     </AppLayout>
 </template>

@@ -1,19 +1,23 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/vue-starter-kit",
+    "name": "holidaygogogo/crm",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "HolidayGoGoGo CRM: shared WhatsApp & Messenger inbox, lead tagging, quick replies, agent assignment and blasting.",
     "keywords": [
         "laravel",
-        "framework"
+        "crm",
+        "whatsapp",
+        "messenger"
     ],
-    "license": "MIT",
+    "license": "proprietary",
     "require": {
-        "php": "^8.3",
+        "php": "^8.4",
         "inertiajs/inertia-laravel": "^3.0",
         "laravel/chisel": "^0.1.0",
         "laravel/fortify": "^1.37.2",
         "laravel/framework": "^13.17",
+        "laravel/horizon": "^5.50",
+        "laravel/reverb": "^1.12",
         "laravel/tinker": "^3.0",
         "laravel/wayfinder": "^0.1.14"
     },
@@ -64,13 +68,9 @@
             "npm run types:check",
             "@test"
         ],
-        "types:check": [
-            "phpstan analyse"
-        ],
         "test": [
             "@php artisan config:clear --ansi",
             "@lint:check",
-            "@types:check",
             "@php artisan test"
         ],
         "post-autoload-dump": [
@@ -96,8 +96,7 @@
         "laravel": {
             "dont-discover": [],
             "installer": {
-                "post-create-project": [
-                ]
+                "post-create-project": []
             }
         }
     },

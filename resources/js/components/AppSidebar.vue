@@ -1,7 +1,30 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
-import { BookOpen, FolderGit2, LayoutGrid } from '@lucide/vue';
+import { Link, usePage } from '@inertiajs/vue3';
+import {
+    Activity,
+    Contact,
+    Inbox,
+    LayoutGrid,
+    Megaphone,
+    PlugZap,
+    Rocket,
+    SlidersHorizontal,
+    Tags,
+    Users,
+    Zap,
+} from '@lucide/vue';
+import { computed } from 'vue';
+import AgentController from '@/actions/App/Http/Controllers/Admin/AgentController';
+import BroadcastController from '@/actions/App/Http/Controllers/Admin/BroadcastController';
+import ChannelController from '@/actions/App/Http/Controllers/Admin/ChannelController';
+import SettingsController from '@/actions/App/Http/Controllers/Admin/SettingsController';
+import SetupController from '@/actions/App/Http/Controllers/Admin/SetupController';
+import TagController from '@/actions/App/Http/Controllers/Admin/TagController';
+import ContactController from '@/actions/App/Http/Controllers/Contacts/ContactController';
+import InboxController from '@/actions/App/Http/Controllers/Inbox/InboxController';
+import QuickReplyController from '@/actions/App/Http/Controllers/QuickReplyController';
 import AppLogo from '@/components/AppLogo.vue';
+import AvailabilityToggle from '@/components/AvailabilityToggle.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
@@ -17,26 +40,42 @@ import {
 import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
-];
+const page = usePage();
+const isAdmin = computed(() => page.props.auth.isAdmin);
 
-const footerNavItems: NavItem[] = [
+const mainNavItems = computed<NavItem[]>(() => [
+    { title: 'Inbox', href: InboxController.index(), icon: Inbox },
+    { title: 'Contacts', href: ContactController.index(), icon: Contact },
+    { title: 'Quick replies', href: QuickReplyController.index(), icon: Zap },
+    ...(isAdmin.value
+        ? [
+              {
+                  title: 'Blasts',
+                  href: BroadcastController.index(),
+                  icon: Megaphone,
+              },
+          ]
+        : []),
+    { title: 'Dashboard', href: dashboard(), icon: LayoutGrid },
+]);
+
+const adminNavItems = computed<NavItem[]>(() => [
+    { title: 'Meta setup', href: SetupController.show(), icon: Rocket },
+    { title: 'Agents', href: AgentController.index(), icon: Users },
+    { title: 'Tags', href: TagController.index(), icon: Tags },
+    { title: 'Channels', href: ChannelController.index(), icon: PlugZap },
     {
-        title: 'Repository',
-        href: 'https://github.com/laravel/vue-starter-kit',
-        icon: FolderGit2,
+        title: 'Settings',
+        href: SettingsController.edit(),
+        icon: SlidersHorizontal,
     },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#vue',
-        icon: BookOpen,
-    },
-];
+]);
+
+const footerNavItems = computed<NavItem[]>(() =>
+    isAdmin.value
+        ? [{ title: 'Queue monitor', href: '/horizon', icon: Activity }]
+        : [],
+);
 </script>
 
 <template>
@@ -45,7 +84,7 @@ const footerNavItems: NavItem[] = [
             <SidebarMenu>
                 <SidebarMenuItem>
                     <SidebarMenuButton size="lg" as-child>
-                        <Link :href="dashboard()">
+                        <Link :href="InboxController.index()">
                             <AppLogo />
                         </Link>
                     </SidebarMenuButton>
@@ -55,10 +94,12 @@ const footerNavItems: NavItem[] = [
 
         <SidebarContent>
             <NavMain :items="mainNavItems" />
+            <NavMain v-if="isAdmin" :items="adminNavItems" label="Admin" />
         </SidebarContent>
 
         <SidebarFooter>
-            <NavFooter :items="footerNavItems" />
+            <NavFooter v-if="footerNavItems.length" :items="footerNavItems" />
+            <AvailabilityToggle />
             <NavUser />
         </SidebarFooter>
     </Sidebar>

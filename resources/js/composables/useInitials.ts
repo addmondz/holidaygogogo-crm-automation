@@ -11,7 +11,12 @@ export function getInitials(fullName?: string): string {
         return '';
     }
 
-    const names = fullName.trim().split(/\s+/u).filter(Boolean);
+    // Ignore brackets and symbols, e.g. "Aisyah (Agent)" -> "AA".
+    const names = fullName
+        .replace(/[^\p{L}\p{N}\s]/gu, '')
+        .trim()
+        .split(/\s+/u)
+        .filter(Boolean);
 
     if (names.length === 0) {
         return '';

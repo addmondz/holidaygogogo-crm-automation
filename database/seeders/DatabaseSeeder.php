@@ -2,24 +2,35 @@
 
 namespace Database\Seeders;
 
+use App\Enums\UserRole;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     /**
-     * Seed the application's database.
+     * Local/demo data. In production create your admin with:
+     *   php artisan crm:create-admin
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        User::query()->firstOrCreate(
+            ['email' => 'admin@example.com'],
+            [
+                'name' => 'Admin',
+                'password' => 'password',
+                'role' => UserRole::Admin,
+                'is_available' => false,
+            ],
+        );
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        User::query()->firstOrCreate(
+            ['email' => 'agent@example.com'],
+            [
+                'name' => 'Aisyah (Agent)',
+                'password' => 'password',
+                'role' => UserRole::Agent,
+            ],
+        );
     }
 }
